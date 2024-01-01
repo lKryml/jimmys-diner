@@ -61,11 +61,10 @@ function getTotalPrice() {
 // * FINISHED
 
 function renderOrderList() {
-  if (itemsArr.length > 0) {
-    createOrder();
-
-    const itemsHTML = itemsArr.map((food) => {
-      return `
+  createOrder();
+  check();
+  const itemsHTML = itemsArr.map((food) => {
+    return `
                     <p class="order-item food-name">
                     ${food.name}
                     <button class="remove-order-item-btn" data-remove="${food.id}">
@@ -74,28 +73,36 @@ function renderOrderList() {
                     </p>
                     <p class="food-price mleft">${food.price}$</p>
     `;
-    });
+  });
 
-    document.getElementById("order-items").innerHTML = itemsHTML;
+  document.getElementById("order-items").innerHTML = itemsHTML;
 
-    getTotalPrice();
-
-    console.log("RENDERED THE ORDER LIST");
-  } else {
+  getTotalPrice();
+  console.log("RENDERED THE ORDER LIST");
+  if (!itemsArr.length) {
     main.removeChild(base);
   }
+  console.log("reached end");
   // !base && main.appendChild;
   // console.log(itemsArr);
 }
 
+function check() {
+  if (!itemsArr.length) {
+    main.removeChild(base);
+    orderCreated = false;
+  }
+}
 function removeOrderItem(item) {
   console.log("ITEMS ARRRAY:");
   console.log(itemsArr);
+
   // ai implementation very good.
   // const index = itemsArr.findIndex((food) => food.id == item.dataset.remove);
   // if (index !== -1) {
   //   itemsArr.splice(index, 1);
   // }
+
   itemsArr.every((food, n) => {
     if (food.id == item.dataset.remove) {
       itemsArr.splice(n, 1);
@@ -118,7 +125,7 @@ function createOrder() {
             </div>
             <button class="order-btn" id="order-btn">Complete order</button>
         `;
-    base.innerHTML += orderTemplateHtml;
+    base.innerHTML = orderTemplateHtml;
     main.appendChild(base);
     orderCreated = true;
   } else {
