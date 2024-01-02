@@ -1,27 +1,15 @@
 import menuArray from "./data.js";
 let orderCreated = false;
-const base = document.createElement(`div`);
-base.classList.add("order-container");
+const orderTemplate = document.createElement(`div`);
+orderTemplate.classList.add("order-container");
 const main = document.getElementById("main");
 const foodSection = document.getElementById("food-section");
 const itemsArr = [];
+const modal = document.getElementById("modal");
+const modalExit = document.getElementById("modal-exit");
+const cardForm = document.getElementById("card-form");
 
-// * FINISHED
-document.addEventListener("click", (e) => {
-  console.log(e.target);
-  if (e.target.dataset.food) {
-    let item = menuArray.filter((food) => {
-      if (food.id == e.target.dataset.food) {
-        return food;
-      }
-    });
-    itemsArr.push(...item);
-    renderOrderList();
-  } else if (e.target.dataset.remove) {
-    removeOrderItem(e.target);
-  }
-});
-// * FINISHED
+//* converts arguement to html based on data.js(foods)
 function getFoodItemsHtml(menu) {
   const foodHTML = menu
     .map((item) => {
@@ -42,24 +30,10 @@ function getFoodItemsHtml(menu) {
     .join("");
   return foodHTML;
 }
-// * FINISHED
+
 foodSection.insertAdjacentHTML("afterbegin", getFoodItemsHtml(menuArray));
-// * FINISHED
 
-function getTotalPrice() {
-  let totalPrice = itemsArr.map((food) => {
-    return food.price;
-  });
-  totalPrice = totalPrice.reduce((total, current) => {
-    return total + current;
-  });
-  document.getElementById("total-price").textContent = totalPrice + "$";
-}
-// * FINISHED
-// * FINISHED
-// * FINISHED
-// * FINISHED
-
+//* calls all necessary funcs and sends item to order list
 function renderOrderList() {
   createOrder();
   check();
@@ -76,43 +50,10 @@ function renderOrderList() {
   });
 
   document.getElementById("order-items").innerHTML = itemsHTML;
-
   getTotalPrice();
-  console.log("RENDERED THE ORDER LIST");
-  if (!itemsArr.length) {
-    main.removeChild(base);
-  }
-  console.log("reached end");
-  // !base && main.appendChild;
-  // console.log(itemsArr);
 }
 
-function check() {
-  if (!itemsArr.length) {
-    main.removeChild(base);
-    orderCreated = false;
-  }
-}
-function removeOrderItem(item) {
-  console.log("ITEMS ARRRAY:");
-  console.log(itemsArr);
-
-  // ai implementation very good.
-  // const index = itemsArr.findIndex((food) => food.id == item.dataset.remove);
-  // if (index !== -1) {
-  //   itemsArr.splice(index, 1);
-  // }
-
-  itemsArr.every((food, n) => {
-    if (food.id == item.dataset.remove) {
-      itemsArr.splice(n, 1);
-      return false;
-    } else return true;
-  });
-
-  renderOrderList();
-}
-
+// *create order html template and append to main
 function createOrder() {
   if (!orderCreated) {
     const orderTemplateHtml = `
@@ -125,10 +66,71 @@ function createOrder() {
             </div>
             <button class="order-btn" id="order-btn">Complete order</button>
         `;
-    base.innerHTML = orderTemplateHtml;
-    main.appendChild(base);
+
+    orderTemplate.innerHTML = orderTemplateHtml;
+    main.appendChild(orderTemplate);
+    document.getElementById("order-btn").addEventListener("click", () => {
+      if (modal.classList.contains("hidden")) modal.classList.toggle("hidden");
+    });
     orderCreated = true;
-  } else {
-    console.log("ORDERCREATED IS TRUE");
   }
 }
+// *check if order is empty and delete order template html
+function check() {
+  if (!itemsArr.length) {
+    main.removeChild(orderTemplate);
+    orderCreated = false;
+  }
+}
+// *calc total price of order
+function getTotalPrice() {
+  let totalPrice = itemsArr.map((food) => {
+    return food.price;
+  });
+  totalPrice = totalPrice.reduce((total, current) => {
+    return total + current;
+  });
+  document.getElementById("total-price").textContent = totalPrice + "$";
+}
+// *event listener for adding items + removing items
+main.addEventListener("click", (e) => {
+  if (e.target.dataset.food) {
+    let item = menuArray.filter((food) => {
+      if (food.id == e.target.dataset.food) {
+        return food;
+      }
+    });
+    itemsArr.push(...item);
+    renderOrderList();
+  } else if (e.target.dataset.remove) {
+    removeOrderItem(e.target);
+  }
+});
+// *Remove items from order
+function removeOrderItem(item) {
+  // ?index implementation
+  // const index = itemsArr.findIndex((food) => food.id == item.dataset.remove);
+  // if (index !== -1) {
+  //   itemsArr.splice(index, 1);
+  // }
+  itemsArr.every((food, n) => {
+    if (food.id == item.dataset.remove) {
+      itemsArr.splice(n, 1);
+      return false;
+    } else return true;
+  });
+  renderOrderList();
+}
+// *MODAL
+modalExit.addEventListener("click", () => modal.classList.toggle("hidden"));
+cardForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const cardFormData = new FormData(cardForm);
+  const name = cardFormData.get("name");
+  const orderFinishedTemplate = document.createElement("div");
+  orderFinishedTemplate.classList.add("order-finished");
+  orderFinishedTemplate.innerHTML = `<p>Thanks,${name}! Your order is on its way!</p>`;
+  modal.classList.toggle("hidden");
+  main.removeChild(orderTemplate);
+  main.appendChild(orderFinishedTemplate);
+});

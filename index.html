@@ -14,7 +14,6 @@
 <body>
 
     <main id="main">
-
         <header>
             <p class="header-title">Jimmy's Diner</p>
             <p class="header-slogan">The best burgers and pizzas in town.</p>
@@ -22,14 +21,20 @@
 
         <section class="food-section" id="food-section">
         </section>
-        
-
-        <div class="modal">
-
-        </div>
-
-
     </main>
+
+    <div class="modal hidden" id="modal">
+        <div class="exit-container">
+            <p>Enter card details</p>
+            <button id="modal-exit" class="modal-exit">X</button>
+        </div>
+        <form id="card-form">
+        <input type="text" name="name" placeholder="Enter your name" aria-label="enter name"required>
+        <input inputmode="numeric" pattern="[0-9\s]{13,19}" type="tel" name="card-number" placeholder="Enter card number" aria-label="enter card number"autocomplete="cc-number" maxlength="19"  required>
+        <input type="password" name="cvv" placeholder="Enter CVV" aria-label="enter CVV" autocomplete="cc-csc" maxlength="3"required>
+        <button type="submit" id="modal-submit" class="modal-submit">Pay</button>
+        </form>
+    </div>
 
     <script src="index.js" type="module"></script>
 </body>
